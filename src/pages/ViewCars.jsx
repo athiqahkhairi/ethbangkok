@@ -14,9 +14,10 @@ const ViewCars = () => {
     setError('')
 
     try {
-      const provider = new ethers.BrowserProvider(window.ethereum)
-      const signer = await provider.getSigner()
-      const contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, signer)
+      // const provider = new ethers.BrowserProvider(window.ethereum)
+      const provider = new ethers.JsonRpcProvider('http://localhost:8545');
+      // const signer = await provider.getSigner()
+      const contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, provider)
 
       const plateNumbers = await contract.getPlateNumbersByIC(icNumber)
       setRegisteredCars(plateNumbers)
