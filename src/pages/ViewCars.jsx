@@ -12,17 +12,32 @@ const ViewCars = () => {
     e.preventDefault()
     setLoading(true)
     setError('')
+    setRegisteredCars([])
 
     try {
-      // const provider = new ethers.BrowserProvider(window.ethereum)
-      const provider = new ethers.JsonRpcProvider('http://localhost:8545');
-      // const signer = await provider.getSigner()
-      const contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, provider)
+      const provider = new ethers.BrowserProvider(window.ethereum) // tukar dengan JsonRpcProvider kalau dah deploy
+      const signer = await provider.getSigner()
+      const contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, signer)
 
-      const plateNumbers = await contract.getPlateNumbersByIC(icNumber)
-      setRegisteredCars(plateNumbers)
+      // First check if the IC exists by trying to get its plate numbers
+      try {
+        const plateNumbers = await contract.getPlateNumbersByIC(icNumber)
+        
+        if (plateNumbers && plateNumbers.length > 0) {
+          setRegisteredCars(plateNumbers)
+        } else {
+          setError('This IC number is not registered in the system')
+        }
+      } catch (err) {
+        // If the contract throws an error, it means the IC doesn't exist
+        setError('This IC number is not registered in the system: ', err)
+      }
     } catch (err) {
-      setError(err.message)
+      if (err.message.includes('execution reverted')) {
+        setError('This IC number is not registered in the system')
+      } else {
+        setError(err.message)
+      }
     } finally {
       setLoading(false)
     }
@@ -34,7 +49,7 @@ const ViewCars = () => {
         <h1 className="text-2xl font-bold mb-6 text-center">View Registered Cars</h1>
 
         {error && (
-          <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
+          <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4 text-center">
             {error}
           </div>
         )}

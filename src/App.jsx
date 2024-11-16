@@ -36,6 +36,7 @@ function App() {
           <Route path="/" element={walletAddress && <LED />} />
           <Route path="/registered-cars" element={<ViewCars />} />
           <Route path="/register-car" element={<RegisterCar />} />
+          <Route path="/car-details/:carId" element={<CarDetails />} />
         </Routes>
       </div>
     </Router>
