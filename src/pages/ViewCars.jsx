@@ -1,36 +1,58 @@
 import React, { useState } from 'react'
 import { ethers } from 'ethers'
 import { CONTRACT_ADDRESS, CONTRACT_ABI } from '../contract/contract'
+import { useNavigate } from 'react-router-dom'
 
 const ViewCars = () => {
   const [icNumber, setIcNumber] = useState('')
   const [registeredCars, setRegisteredCars] = useState([])
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
+  const [carFines, setCarFines] = useState({})
+  const navigate = useNavigate()
+
+  const fetchUnpaidFines = async (plateNumber) => {
+    try {
+      const provider = new ethers.BrowserProvider(window.ethereum)
+      const signer = await provider.getSigner()
+      const contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, signer)
+      
+      const unpaidFines = await contract.getTotalUnpaidFines(plateNumber)
+      return ethers.formatEther(unpaidFines)
+    } catch (err) {
+      console.error(`Error fetching fines for ${plateNumber}:`, err)
+      return '0'
+    }
+  }
 
   const fetchRegisteredCars = async (e) => {
     e.preventDefault()
     setLoading(true)
     setError('')
     setRegisteredCars([])
+    setCarFines({})
 
     try {
-      const provider = new ethers.BrowserProvider(window.ethereum) // tukar dengan JsonRpcProvider kalau dah deploy
+      const provider = new ethers.BrowserProvider(window.ethereum)
       const signer = await provider.getSigner()
       const contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, signer)
 
-      // First check if the IC exists by trying to get its plate numbers
       try {
         const plateNumbers = await contract.getPlateNumbersByIC(icNumber)
         
         if (plateNumbers && plateNumbers.length > 0) {
           setRegisteredCars(plateNumbers)
+          
+          const fines = {}
+          for (const plateNumber of plateNumbers) {
+            fines[plateNumber] = await fetchUnpaidFines(plateNumber)
+          }
+          setCarFines(fines)
         } else {
           setError('This IC number is not registered in the system')
         }
       } catch (err) {
-        // If the contract throws an error, it means the IC doesn't exist
-        setError('This IC number is not registered in the system: ', err)
+        setError('This IC number is not registered in the system')
       }
     } catch (err) {
       if (err.message.includes('execution reverted')) {
@@ -41,6 +63,15 @@ const ViewCars = () => {
     } finally {
       setLoading(false)
     }
+  }
+
+  const totalUnpaid = async (plateNumber) => {
+      const provider = new ethers.BrowserProvider(window.ethereum) // tukar dengan JsonRpcProvider kalau dah deploy
+      const signer = await provider.getSigner()
+      const contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, signer)
+
+      const unpaid = contract.getTotalUnpaid(plateNumber);
+      return unpaid;
   }
 
   return (
@@ -86,9 +117,13 @@ const ViewCars = () => {
               {registeredCars.map((plateNumber, index) => (
                 <li
                   key={index}
-                  className="bg-gray-50 p-3 rounded border border-gray-200"
+                  className="bg-gray-50 p-3 rounded border border-gray-200 flex justify-between items-center cursor-pointer hover:bg-gray-100 transition-colors"
+                  onClick={() => navigate(`/car-details/${plateNumber}`)}
                 >
-                  {plateNumber}
+                  <span>{plateNumber}</span>
+                  <span className="text-sm text-gray-600">
+                    Unpaid: {carFines[plateNumber] || '0'} ETH
+                  </span>
                 </li>
               ))}
             </ul>

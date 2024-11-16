@@ -5,6 +5,7 @@ import LED from './components/LED';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import ViewCars from './pages/ViewCars'
 import RegisterCar from './pages/RegisterCar'
+import CarDetails from './pages/CarDetails'
 
 function App() {
   const [walletAddress, setWalletAddress] = useState(null);
@@ -36,7 +37,7 @@ function App() {
           <Route path="/" element={walletAddress && <LED />} />
           <Route path="/registered-cars" element={<ViewCars />} />
           <Route path="/register-car" element={<RegisterCar />} />
-          {/* <Route path="/car-details/:carId" element={<CarDetails />} /> */}
+          <Route path="/car-details/:plateNumber" element={<CarDetails />} />
         </Routes>
       </div>
     </Router>
