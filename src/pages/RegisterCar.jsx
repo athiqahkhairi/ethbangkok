@@ -1,4 +1,5 @@
-/* eslint-disable react/prop-types */
+// /* eslint-disable react/prop-types */
+// eslint-disable-next-line no-unused-vars
 import React, { useState } from 'react'
 import { ethers } from 'ethers'
 import { CONTRACT_ADDRESS, CONTRACT_ABI } from '../contract/contract'

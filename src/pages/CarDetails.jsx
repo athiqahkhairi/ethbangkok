@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import React, { useState, useEffect } from 'react'
 import { useParams } from 'react-router-dom'
 import { ethers } from 'ethers'
@@ -13,6 +14,7 @@ const CarDetails = () => {
 
   useEffect(() => {
     fetchCarDetails()
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [plateNumber])
 
   const fetchCarDetails = async () => {

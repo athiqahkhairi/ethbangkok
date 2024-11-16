@@ -6,6 +6,7 @@ import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import ViewCars from './pages/ViewCars'
 import RegisterCar from './pages/RegisterCar'
 import CarDetails from './pages/CarDetails'
+import Web3AuthTest from './pages/Web3AuthTest';
 
 function App() {
   const [walletAddress, setWalletAddress] = useState(null);
@@ -38,6 +39,7 @@ function App() {
           <Route path="/registered-cars" element={<ViewCars />} />
           <Route path="/register-car" element={<RegisterCar />} />
           <Route path="/car-details/:plateNumber" element={<CarDetails />} />
+          <Route path='/web3auth' element={<Web3AuthTest />} />
         </Routes>
       </div>
     </Router>
