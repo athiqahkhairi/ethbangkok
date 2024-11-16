@@ -1,24 +1,27 @@
-
-import { ethers } from 'ethers'
-import Contract from '../contract/LED.json'
+import { useWeb3Auth } from '../context/Web3AuthContext';
+import { ethers } from 'ethers';
+import Contract from '../contract/LED.json';
 
 const LED = () => {
-    const contractAddress = "0xceF52CE0b79Cb3AF65E9F48E28b7ab78Bb8fdC3b"
-    const contractABI = Contract.abi
+    const { provider } = useWeb3Auth();
+    const contractAddress = "0xceF52CE0b79Cb3AF65E9F48E28b7ab78Bb8fdC3b";
+    const contractABI = Contract.abi;
 
     const turnOn = async () => {
-        const provider = new ethers.BrowserProvider(window.ethereum)
-        const signer = await provider.getSigner()
-        const contract = new ethers.Contract(contractAddress, contractABI, signer)
-        await contract.turnOn()
-    }
+        if (!provider) return;
+        const ethersProvider = new ethers.BrowserProvider(provider);
+        const signer = await ethersProvider.getSigner();
+        const contract = new ethers.Contract(contractAddress, contractABI, signer);
+        await contract.turnOn();
+    };
 
     const turnOff = async () => {
-        const provider = new ethers.BrowserProvider(window.ethereum)
-        const signer = await provider.getSigner()
-        const contract = new ethers.Contract(contractAddress, contractABI, signer)
-        await contract.turnOff()
-    }
+        if (!provider) return;
+        const ethersProvider = new ethers.BrowserProvider(provider);
+        const signer = await ethersProvider.getSigner();
+        const contract = new ethers.Contract(contractAddress, contractABI, signer);
+        await contract.turnOff();
+    };
 
     return (
         <div className="flex items-center justify-center h-screen">
