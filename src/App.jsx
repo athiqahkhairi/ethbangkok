@@ -7,42 +7,28 @@ import ViewCars from './pages/ViewCars'
 import RegisterCar from './pages/RegisterCar'
 import CarDetails from './pages/CarDetails'
 import Web3AuthTest from './pages/Web3AuthTest';
+import { Web3AuthProvider } from './context/Web3AuthContext';
+import Home from './pages/Home';
 
 function App() {
-  const [walletAddress, setWalletAddress] = useState(null);
-  // const contractAddress = ""
-
-  const handleWalletConnected = (address) => {
-    setWalletAddress(address);
-  };
-
   return (
-    // <div className="App bg-slate-300">
-    //   <div className="navbar">
-    //     <Navbar onWalletConnected={handleWalletConnected} />
-    //   </div>
-    //   <div className="led">
-    //     {walletAddress && (
-    //       <LED />
-    //     )}
-    //   </div>
-      
-    // </div>
-    <Router>
-      <div className="App bg-slate-300 min-h-screen">
-        <div className="navbar sticky top-0 z-50">
-          <Navbar onWalletConnected={handleWalletConnected} />
+    <Web3AuthProvider>
+      <Router>
+        <div className="App bg-slate-300 min-h-screen">
+          {/* <div className="navbar sticky top-0 z-50"> */}
+            {/* <Navbar /> */}
+          {/* </div> */}
+          
+          <Routes>
+            <Route path="/" element={<Home />} />
+            <Route path="/registered-cars" element={<ViewCars />} />
+            <Route path="/register-car" element={<RegisterCar />} />
+            <Route path="/car-details/:plateNumber" element={<CarDetails />} />
+            <Route path='/web3auth' element={<Web3AuthTest />} />
+          </Routes>
         </div>
-        
-        <Routes>
-          <Route path="/" element={walletAddress && <LED />} />
-          <Route path="/registered-cars" element={<ViewCars />} />
-          <Route path="/register-car" element={<RegisterCar />} />
-          <Route path="/car-details/:plateNumber" element={<CarDetails />} />
-          <Route path='/web3auth' element={<Web3AuthTest />} />
-        </Routes>
-      </div>
-    </Router>
+      </Router>
+    </Web3AuthProvider>
   );
 }
 
