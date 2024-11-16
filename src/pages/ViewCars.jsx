@@ -111,6 +111,7 @@ const ViewCars = () => {
           </button>
         </form>
 
+
         {registeredCars.length > 0 && (
           <div className="mt-6">
             <h2 className="text-xl font-semibold mb-4">Registered Cars</h2>
