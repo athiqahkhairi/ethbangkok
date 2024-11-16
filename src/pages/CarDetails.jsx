@@ -55,6 +55,36 @@ const CarDetails = () => {
     }
   }
 
+  const handlePayFines = async () => {
+    setLoading(true)
+    setError('')
+
+    try {
+      const provider = new ethers.BrowserProvider(window.ethereum)
+      const signer = await provider.getSigner()
+      const contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, signer)
+
+      // Convert ETH to Wei for the transaction
+      const totalToPayWei = ethers.parseEther(totalUnpaidFines)
+      
+      // Call the payFine function with the required ETH value
+      const tx = await contract.payFine(plateNumber, {
+        value: totalToPayWei
+      })
+      
+      // Wait for transaction to be mined
+      await tx.wait()
+      
+      // Refresh the car details
+      await fetchCarDetails()
+      
+    } catch (err) {
+      setError(err.message)
+    } finally {
+      setLoading(false)
+    }
+  }
+
   return (
     <div className="container mx-auto px-4 py-8">
       <div className="max-w-2xl mx-auto bg-white rounded-lg shadow p-6">
@@ -76,6 +106,15 @@ const CarDetails = () => {
               <h2 className="text-xl font-semibold mb-2">Summary</h2>
               <p>Total Violations: {violationCount}</p>
               <p>Total Unpaid Fines: {totalUnpaidFines} ETH</p>
+              {Number(totalUnpaidFines) > 0 && (
+                <button
+                  onClick={handlePayFines}
+                  disabled={loading}
+                  className="mt-4 w-full bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-700 disabled:bg-blue-300 disabled:cursor-not-allowed transition-colors"
+                >
+                  {loading ? 'Processing...' : 'Pay All Fines'}
+                </button>
+              )}
             </div>
 
             {violations.length > 0 && (
